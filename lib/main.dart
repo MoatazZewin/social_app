@@ -1,9 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_simple_app/layout/home_cubit/home_cubit.dart';
+import 'package:social_simple_app/layout/home_cubit/home_states.dart';
+import 'package:social_simple_app/layout/home_layout.dart';
 import 'package:social_simple_app/modules/login/login_screen.dart';
+import 'package:social_simple_app/shared/components/constants.dart';
 import 'package:social_simple_app/shared/network/local/cache_helper.dart';
 import 'package:social_simple_app/shared/network/remote/dio/dio_helper.dart';
+import 'package:social_simple_app/shared/styles/themes.dart';
 
 import 'bloc_observer.dart';
 
@@ -13,30 +19,39 @@ void main()async {
   await Firebase.initializeApp();
   DioHelper.init();
   await CacheHelper.init();
+  uId = CacheHelper.getData(key: 'uId');
+  Widget startWidget;
 
-  runApp(MyApp());
+  if(uId != null)
+    {
+      startWidget = const HomeScreen();
+    }else
+      {
+        startWidget = LoginScreen();
+      }
+
+  runApp(MyApp(startWidget));
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  Widget startWidget;
+
+  MyApp(this.startWidget);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Home',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: LoginScreen(),
+    return MultiBlocProvider(providers:[
+      BlocProvider(create: (context)=> HomeCubit()..getUserData()),
+    ],
+        child: BlocConsumer<HomeCubit, HomeStates>(listener: (context, state){},
+        builder: (context, state){
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: lightTheme,
+            home:startWidget,
+          );
+        })
     );
   }
 }

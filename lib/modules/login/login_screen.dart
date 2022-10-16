@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../layout/home_layout.dart';
 import '../../shared/components/components.dart';
+import '../../shared/network/local/cache_helper.dart';
 import '../register/register_screen.dart';
 import 'cubit/login_cubit.dart';
 import 'cubit/login_states.dart';
@@ -18,10 +20,14 @@ class LoginScreen extends StatelessWidget {
       create: (context) => LoginCubit(),
       child: BlocConsumer<LoginCubit, LoginStates>(
         listener: (context, state) {
-          if(state is LoginErrorState)
-            {
-              showToast(message: state.error, color: ToastState.EROERR);
-            }
+          if (state is LoginErrorState) {
+            showToast(message: state.error, color: ToastState.EROERR);
+          }
+          if (state is LoginSuccessState) {
+            CacheHelper.setData(key: 'uId', value: state.uId).then((value) {
+              navigateAndFinish(context: context, widget: const HomeScreen());
+            });
+          }
         },
         builder: (context, state) => Scaffold(
           appBar: AppBar(),

@@ -22,6 +22,7 @@ class RegisterScreeen extends StatelessWidget {
         listener: (context, state) {
           if (state is CreateUserSuccessState) {
             navigateAndFinish(context: context, widget: const HomeScreen());
+
           }
         },
         builder: (context, state) {
