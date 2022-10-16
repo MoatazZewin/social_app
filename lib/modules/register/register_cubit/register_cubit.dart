@@ -28,20 +28,21 @@ class RegisterCubit extends Cubit<RegisterStates> {
     required String phone,
   }) {
     emit(RegisterLoadingState());
-   FirebaseAuth.instance.createUserWithEmailAndPassword(
-       email: email,
-       password: password)
-       .then((value){
-         print(value.user?.email);
-         print(value.user?.uid);
-         createUser(name: name, email: email, phone: phone, uId: value.user!.uid,isEmailVerified: false);
-
-   })
-       .catchError((onError)
-   {
-     print(onError.toString());
-     emit(RegisterErrorState(onError.toString()));
-   });
+    FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+      print(value.user?.email);
+      print(value.user?.uid);
+      createUser(
+          name: name,
+          email: email,
+          phone: phone,
+          uId: value.user!.uid,
+          isEmailVerified: false);
+    }).catchError((onError) {
+      print(onError.toString());
+      emit(RegisterErrorState(onError.toString()));
+    });
   }
 
   void createUser({
@@ -50,19 +51,27 @@ class RegisterCubit extends Cubit<RegisterStates> {
     required String phone,
     required String uId,
     required bool isEmailVerified,
-  }){
-    UserModel userModel = UserModel(name, email, phone, uId,false);
+  }) {
+    UserModel userModel = UserModel(
+        name: name,
+        email: email,
+        phone: phone,
+        uId: uId,
+        image:
+            'https://img.freepik.com/free-photo/unique-beautiful-women-hands_23-2149012590.jpg?w=740&t=st=1665924585~exp=1665925185~hmac=7d03537819d4f4b7bf376f490a43f353727f39a31bae06661acc87b0537a2336',
+        bio: 'write your bio....',
+        cover: 'https://img.freepik.com/premium-vector/realistic-autumn-background_52683-72279.jpg?w=740',
+        isEmailVerified: false);
 
-    FirebaseFirestore.instance.collection('users').doc(uId).set(userModel.toMap())
-        .then((value){
-          emit(CreateUserSuccessState());
-
-    }).catchError((onError){
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(uId)
+        .set(userModel.toMap())
+        .then((value) {
+      emit(CreateUserSuccessState());
+    }).catchError((onError) {
       print(onError.toString());
       emit(CreateUserErrorState(onError.toString()));
-
     });
-
-
   }
 }

@@ -52,7 +52,7 @@ Widget defaultButton({
   required Function() onPressed,
 }) =>
     Container(
-      height: 50.0,
+      height: 40.0,
       width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(
