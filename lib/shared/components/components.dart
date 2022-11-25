@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:social_simple_app/shared/styles/icon_broken.dart';
 
 import '../styles/colors.dart';
 
@@ -198,5 +199,28 @@ Widget buildProductItem( model, context,{bool isOldPrice = true}) {
         ],
       ),
     ),
+  );
+}
+
+
+ defaultAppBar({
+  required BuildContext context,
+  required String title,
+  List<Widget>? actions,
+})
+{
+  return AppBar(
+    leading: IconButton(
+      onPressed: (){
+        Navigator.pop(context);
+      },
+      icon: Icon(
+        IconBroken.Arrow___Left_2,
+      ),
+    ),
+    title: Text(title),
+    titleSpacing: 5.0,
+    actions: actions,
+
   );
 }

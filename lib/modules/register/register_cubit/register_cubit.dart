@@ -59,7 +59,7 @@ class RegisterCubit extends Cubit<RegisterStates> {
         uId: uId,
         image:
             'https://img.freepik.com/free-photo/unique-beautiful-women-hands_23-2149012590.jpg?w=740&t=st=1665924585~exp=1665925185~hmac=7d03537819d4f4b7bf376f490a43f353727f39a31bae06661acc87b0537a2336',
-        bio: 'write your bio....',
+        bio:'write your bio....',
         cover: 'https://img.freepik.com/premium-vector/realistic-autumn-background_52683-72279.jpg?w=740',
         isEmailVerified: false);
 
@@ -70,7 +70,7 @@ class RegisterCubit extends Cubit<RegisterStates> {
         .then((value) {
       emit(CreateUserSuccessState());
     }).catchError((onError) {
-      print(onError.toString());
+      print('the error inside the create user ${onError.toString()}');
       emit(CreateUserErrorState(onError.toString()));
     });
   }

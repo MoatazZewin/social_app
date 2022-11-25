@@ -6,6 +6,7 @@ import 'package:social_simple_app/shared/styles/icon_broken.dart';
 import '../../layout/home_cubit/home_cubit.dart';
 import '../../layout/home_cubit/home_states.dart';
 import '../../shared/components/components.dart';
+import '../edit_profile/edit_profile.dart';
 
 
 class SettingScreen extends StatelessWidget {
@@ -143,9 +144,13 @@ class SettingScreen extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Expanded(child: OutlinedButton(onPressed: (){}, child: const Text('Add Photos'))),
+                    Expanded(child: OutlinedButton(onPressed: (){
+
+                    }, child: const Text('Add Photos'))),
                     const SizedBox(width: 10.0,),
-                    OutlinedButton(onPressed: (){}, child: const Icon(IconBroken.Edit)),
+                    OutlinedButton(onPressed: (){
+                      navigateTo(context: context, widget: EditProfile());
+                    }, child: const Icon(IconBroken.Edit)),
 
                   ],
                 ),
