@@ -20,6 +20,14 @@ class UploadCoverImageErrorState extends HomeStates{}
 class UploadProfileImageSuccessState extends HomeStates{}
 class UploadProfileImageErrorState extends HomeStates{}
 
+class UploadPostImageSuccessState extends HomeStates{}
+class UploadPostImageErrorState extends HomeStates{}
+class RemovePostImageState extends HomeStates{}
+
 
 class UserUpdateLoadingState extends HomeStates{}
 class UserUpdateErrorState extends HomeStates{}
+
+class CreatePostLoadingState extends HomeStates{}
+class CreatePostSuccessState extends HomeStates{}
+class CreatePostErrorState extends HomeStates{}

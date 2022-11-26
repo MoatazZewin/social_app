@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_simple_app/layout/home_cubit/home_states.dart';
+import 'package:social_simple_app/models/post_model.dart';
 import 'package:social_simple_app/models/user_model.dart';
 import 'package:social_simple_app/modules/chats/chats_screen.dart';
 import 'package:social_simple_app/modules/settings/setting_screen.dart';
@@ -83,6 +84,24 @@ class HomeCubit extends Cubit<HomeStates> {
     }
   }
 
+  XFile? postImage;
+  File? postPath;
+  Future getPostImage() async {
+    postImage = await picker.pickImage(source: ImageSource.gallery);
+    if (postImage != null) {
+      postPath = File(postImage!.path);
+      emit(UploadPostImageSuccessState());
+    } else {
+      emit(UploadPostImageErrorState());
+    }
+  }
+
+  void removePostImage()
+  {
+    postPath = null;
+    emit(RemovePostImageState());
+  }
+
   final storage = FirebaseStorage.instance;
 
   void uploadProfileImage({
@@ -148,6 +167,51 @@ class HomeCubit extends Cubit<HomeStates> {
   //
   //   }
   // }
+
+  void uploadPostImage({
+    required String dataTime,
+    required String text,
+  }) {
+    emit(CreatePostLoadingState());
+    storage
+        .ref()
+        .child('posts/${Uri.file(postPath!.path).pathSegments.last}')
+        .putFile(postPath!)
+        .then((p0) {
+      p0.ref.getDownloadURL().then((value) {
+        print('url download $p0');
+        createPost(dataTime: dataTime, text: text, postImage: value);
+      }).catchError((error) {
+        emit(UploadPostImageErrorState());
+      });
+    }).catchError((onError) {
+      emit(UploadPostImageErrorState());
+    });
+  }
+
+  void createPost({
+    required String dataTime,
+    required String text,
+     String? postImage,
+  }) {
+
+    PostModel userModel = PostModel(
+        name: model?.name,
+        image: model?.image,
+        uId: model?.uId,
+        dateTime: dataTime,
+    text: text,
+    postImage: postImage??'');
+
+    FirebaseFirestore.instance
+        .collection('posts')
+        .add(userModel.toMap())
+        .then((value) {
+          emit(CreatePostSuccessState());
+    }).catchError((onError) {
+      emit(CreatePostErrorState());
+    });
+  }
 
   void updateUser({
     required String name,

@@ -214,7 +214,7 @@ Widget buildProductItem( model, context,{bool isOldPrice = true}) {
       onPressed: (){
         Navigator.pop(context);
       },
-      icon: Icon(
+      icon: const Icon(
         IconBroken.Arrow___Left_2,
       ),
     ),
