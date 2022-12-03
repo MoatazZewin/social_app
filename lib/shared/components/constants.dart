@@ -14,3 +14,5 @@ void signOut(context)
 
  String? token ;
  String? uId;
+ bool? isFromLogin;
+ bool? isFromRegister;

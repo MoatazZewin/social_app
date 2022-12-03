@@ -43,7 +43,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers:[
-      BlocProvider(create: (context)=> HomeCubit()..getUserData()),
+          startWidget is HomeScreen ?
+      BlocProvider(create: (context)=> HomeCubit()..getUserData()..getPosts()):
+          BlocProvider(create: (context)=> HomeCubit()),
     ],
         child: BlocConsumer<HomeCubit, HomeStates>(listener: (context, state){},
         builder: (context, state){

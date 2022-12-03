@@ -4,8 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_simple_app/layout/home_cubit/home_cubit.dart';
 import 'package:social_simple_app/models/user_model.dart';
 import 'package:social_simple_app/modules/register/register_cubit/register_states.dart';
+
+import '../../../shared/components/constants.dart';
 
 class RegisterCubit extends Cubit<RegisterStates> {
   RegisterCubit() : super(RegisterInitialState());
@@ -26,6 +29,7 @@ class RegisterCubit extends Cubit<RegisterStates> {
     required String email,
     required String password,
     required String phone,
+    required context,
   }) {
     emit(RegisterLoadingState());
     FirebaseAuth.instance
@@ -38,7 +42,8 @@ class RegisterCubit extends Cubit<RegisterStates> {
           email: email,
           phone: phone,
           uId: value.user!.uid,
-          isEmailVerified: false);
+          isEmailVerified: false,
+      context: context);
     }).catchError((onError) {
       print(onError.toString());
       emit(RegisterErrorState(onError.toString()));
@@ -51,16 +56,16 @@ class RegisterCubit extends Cubit<RegisterStates> {
     required String phone,
     required String uId,
     required bool isEmailVerified,
+    required context,
   }) {
     UserModel userModel = UserModel(
         name: name,
         email: email,
         phone: phone,
         uId: uId,
-        image:
-            'https://img.freepik.com/free-photo/unique-beautiful-women-hands_23-2149012590.jpg?w=740&t=st=1665924585~exp=1665925185~hmac=7d03537819d4f4b7bf376f490a43f353727f39a31bae06661acc87b0537a2336',
+        image: 'https://img.freepik.com/free-photo/unique-beautiful-women-hands_23-2149012590.jpg?w=740&t=st=1665924585~exp=1665925185~hmac=7d03537819d4f4b7bf376f490a43f353727f39a31bae06661acc87b0537a2336',
         bio:'write your bio....',
-        cover: 'https://img.freepik.com/premium-vector/realistic-autumn-background_52683-72279.jpg?w=740',
+        cover:'https://img.freepik.com/premium-vector/realistic-autumn-background_52683-72279.jpg?w=740',
         isEmailVerified: false);
 
     FirebaseFirestore.instance
@@ -68,6 +73,8 @@ class RegisterCubit extends Cubit<RegisterStates> {
         .doc(uId)
         .set(userModel.toMap())
         .then((value) {
+          HomeCubit.get(context).model = userModel;
+          isFromRegister = true;
       emit(CreateUserSuccessState());
     }).catchError((onError) {
       print('the error inside the create user ${onError.toString()}');

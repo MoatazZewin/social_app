@@ -104,7 +104,8 @@ class LoginScreen extends StatelessWidget {
                                 if (keyForm.currentState!.validate()) {
                                   LoginCubit.get(context).userLogin(
                                       email: emailController.text,
-                                      password: passwordController.text);
+                                      password: passwordController.text,
+                                  context: context);
                                 }
                               })
                           : const Center(child: CircularProgressIndicator()),

@@ -6,6 +6,7 @@ import 'package:social_simple_app/modules/new_posts/new_posts.dart';
 import 'package:social_simple_app/shared/components/components.dart';
 import 'package:social_simple_app/shared/styles/icon_broken.dart';
 
+import '../shared/components/constants.dart';
 import 'home_cubit/home_cubit.dart';
 import 'home_cubit/home_states.dart';
 
@@ -18,11 +19,24 @@ class HomeScreen extends StatelessWidget {
         listener: (context, state) {
           if(state is NewPostsState)
             {
-              navigateTo(context: context, widget: NewPosts());
+              navigateTo(context: context, widget: const NewPosts());
             }
         },
         builder: (context, state) {
           var cubit = HomeCubit.get(context);
+          var user = HomeCubit.get(context).model;
+          if(user == null && isFromLogin == true)
+            {
+              HomeCubit.get(context).getUserData();
+              HomeCubit.get(context).getPosts();
+              isFromLogin = false;
+            }
+          if(isFromRegister == true)
+            {
+              HomeCubit.get(context).getUserData();
+              isFromRegister = false;
+            }
+
 
           return Scaffold(
             appBar: AppBar(

@@ -36,15 +36,15 @@ class NewPosts extends StatelessWidget {
                   if(state is CreatePostLoadingState)
                     const SizedBox(height: 10.0,),
                   Row(
-                    children:  const [
+                    children:  [
                       CircleAvatar(
                         radius: 25.0,
                         backgroundImage: NetworkImage(
-                            'https://image.freepik.com/free-photo/horizontal-shot-smiling-curly-haired-woman-indicates-free-space-demonstrates-place-your-advertisement-attracts-attention-sale-wears-green-turtleneck-isolated-vibrant-pink-wall_273609-42770.jpg'
+                            '${HomeCubit.get(context).model?.image}'
                         ),
                       ),
                       SizedBox(width: 15.0,),
-                      Text('moataz ahmed'),
+                      Text('${HomeCubit.get(context).model?.name}'),
                     ],
                   ),
                   Expanded(
