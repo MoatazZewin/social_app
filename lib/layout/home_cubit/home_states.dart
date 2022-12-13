@@ -67,3 +67,10 @@ class SendMessageErrorState extends HomeStates{}
 
 class GetMessageSuccessState extends HomeStates{}
 
+
+class ChangeLikesPostLengthSuccessState extends HomeStates{}
+class AddUserLikeSuccessState extends HomeStates{}
+
+class DeleteLikeFromPostSuccessState extends HomeStates{}
+class DeleteLikeFromPostErrorState extends HomeStates{}
+

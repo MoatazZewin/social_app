@@ -1,39 +1,31 @@
-import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_simple_app/layout/home_cubit/home_cubit.dart';
 import 'package:social_simple_app/modules/login/cubit/login_states.dart';
 import 'package:social_simple_app/shared/components/constants.dart';
-import 'package:social_simple_app/shared/network/local/cache_helper.dart';
-
-import '../../../models/user_model.dart';
 
 class LoginCubit extends Cubit<LoginStates> {
   LoginCubit() : super(LoginInitialState());
 
   static LoginCubit get(context) => BlocProvider.of(context);
 
-  void userLogin({
-    required String email,
-    required String password,
-    required context
-  }) {
+  void userLogin(
+      {required String email, required String password, required context}) {
     emit(LoginLoadingState());
-    FirebaseAuth.instance.signInWithEmailAndPassword(email: email,
-        password: password).then((value) {
-          print(value.user?.uid);
-          uId = value.user?.uid;
-          isFromLogin = true;
-          emit(LoginSuccessState(value.user?.uid));
-    }).catchError((onError){
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+      // print(value.user?.uid);
+      uId = value.user?.uid;
+      isFromLogin = true;
+      emit(LoginSuccessState(value.user?.uid));
+    }).catchError((onError) {
       emit(LoginErrorState(onError.toString()));
     });
   }
 
   bool isScure = true;
-  IconData suffix = Icons.visibility_off_outlined;
+  IconData suffix = Icons.visibility_outlined;
 
   void changePasswordVisibility() {
     isScure = !isScure;

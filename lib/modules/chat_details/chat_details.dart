@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_simple_app/layout/home_cubit/home_cubit.dart';
@@ -7,6 +6,7 @@ import 'package:social_simple_app/models/user_model.dart';
 import 'package:social_simple_app/shared/styles/colors.dart';
 import 'package:social_simple_app/shared/styles/icon_broken.dart';
 
+import '../../shared/components/components.dart';
 import '../../shared/components/constants.dart';
 
 class ChatDetailsScreen extends StatelessWidget {
@@ -47,10 +47,25 @@ class ChatDetailsScreen extends StatelessWidget {
                     Expanded(
                       child: ListView.separated(
                           itemBuilder: (context, index) {
-                            if(HomeCubit.get(context).messageList[index].senderId == uId ) {
-                              return buildMyMessage(HomeCubit.get(context).messageList[index].text);
+                            if (HomeCubit.get(context)
+                                    .messageList[index]
+                                    .senderId ==
+                                uId) {
+                              return buildMyMessage(
+                                  HomeCubit.get(context)
+                                      .messageList[index]
+                                      .text,
+                                  HomeCubit.get(context)
+                                      .messageList[index]
+                                      .dateTime,
+                                  context);
                             }
-                            return buildMessage(HomeCubit.get(context).messageList[index].text);
+                            return buildMessage(
+                                HomeCubit.get(context).messageList[index].text,
+                                HomeCubit.get(context)
+                                    .messageList[index]
+                                    .dateTime,
+                                context);
                           },
                           separatorBuilder: (context, index) => const SizedBox(
                                 height: 15.0,
@@ -88,7 +103,7 @@ class ChatDetailsScreen extends StatelessWidget {
                               onPressed: () {
                                 HomeCubit.get(context).sendMessage(
                                     text: controller.text,
-                                    dateTime: DateTime.now().toString(),
+                                    dateTime: DateTime.now(),
                                     receiverId: model?.uId);
                                 controller.text = '';
                               },
@@ -112,7 +127,7 @@ class ChatDetailsScreen extends StatelessWidget {
     });
   }
 
-  Widget buildMessage(String? message) => Align(
+  Widget buildMessage(String? message, timeStamp, context) => Align(
         alignment: AlignmentDirectional.centerStart,
         child: Container(
             padding: const EdgeInsets.symmetric(
@@ -121,15 +136,24 @@ class ChatDetailsScreen extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius:  const BorderRadiusDirectional.only(
+              borderRadius: const BorderRadiusDirectional.only(
                 topStart: Radius.circular(10.0),
                 topEnd: Radius.circular(10.0),
                 bottomEnd: Radius.circular(10.0),
               ),
             ),
-            child:  Text(message!)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('${message!} '),
+                Text(
+                  formattedDate(timeStamp),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            )),
       );
-  Widget buildMyMessage(String? message) => Align(
+  Widget buildMyMessage(String? message, timeStamp, context) => Align(
         alignment: AlignmentDirectional.centerEnd,
         child: Container(
             padding: const EdgeInsets.symmetric(
@@ -144,6 +168,18 @@ class ChatDetailsScreen extends StatelessWidget {
                 bottomStart: Radius.circular(10.0),
               ),
             ),
-            child:  Text(message!)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('${message!} '),
+                Text(
+                  formattedDate(timeStamp),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(fontSize: 10.0),
+                ),
+              ],
+            )),
       );
 }

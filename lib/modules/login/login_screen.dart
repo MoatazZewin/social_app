@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -68,6 +67,7 @@ class LoginScreen extends StatelessWidget {
                             if (value!.isEmpty) {
                               return 'please enter the email';
                             }
+                            return null;
                           }),
                       const SizedBox(
                         height: 20.0,
@@ -93,6 +93,7 @@ class LoginScreen extends StatelessWidget {
                             if (value!.isEmpty) {
                               return 'the password is too short';
                             }
+                            return null;
                           }),
                       const SizedBox(
                         height: 20.0,
@@ -105,7 +106,7 @@ class LoginScreen extends StatelessWidget {
                                   LoginCubit.get(context).userLogin(
                                       email: emailController.text,
                                       password: passwordController.text,
-                                  context: context);
+                                      context: context);
                                 }
                               })
                           : const Center(child: CircularProgressIndicator()),
@@ -115,7 +116,7 @@ class LoginScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Don\`t have an account?'),
+                          const Text('Don`t have an account?'),
                           const SizedBox(
                             width: 5.0,
                           ),

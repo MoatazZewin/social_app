@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +12,7 @@ import 'package:social_simple_app/shared/styles/themes.dart';
 
 import 'bloc_observer.dart';
 
-void main()async {
+void main() async {
   Bloc.observer = MyBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -22,13 +21,11 @@ void main()async {
   uId = CacheHelper.getData(key: 'uId');
   Widget startWidget;
 
-  if(uId != null)
-    {
-      startWidget = const HomeScreen();
-    }else
-      {
-        startWidget = LoginScreen();
-      }
+  if (uId != null) {
+    startWidget = const HomeScreen();
+  } else {
+    startWidget = LoginScreen();
+  }
 
   runApp(MyApp(startWidget));
 }
@@ -42,19 +39,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-        providers:[
-          startWidget is HomeScreen ?
-      BlocProvider(create: (context)=> HomeCubit()..getUserData()..getPosts()):
-          BlocProvider(create: (context)=> HomeCubit()),
-    ],
-        child: BlocConsumer<HomeCubit, HomeStates>(listener: (context, state){},
-        builder: (context, state){
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: lightTheme,
-            home:startWidget,
-          );
-        })
-    );
+        providers: [
+          startWidget is HomeScreen
+              ? BlocProvider(
+                  create: (context) => HomeCubit()
+                    ..getUserData()
+                    ..getPosts())
+              : BlocProvider(create: (context) => HomeCubit()),
+        ],
+        child: BlocConsumer<HomeCubit, HomeStates>(
+            listener: (context, state) {},
+            builder: (context, state) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: lightTheme,
+                home: startWidget,
+              );
+            }));
   }
 }

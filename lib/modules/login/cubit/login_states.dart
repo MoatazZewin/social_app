@@ -16,9 +16,11 @@ class LoginErrorState extends LoginStates {
 
 class LoginPasswordVisibilityState extends LoginStates {}
 
-class LoginGetUserLoadingState extends LoginStates{}
-class LoginGetUserSuccessState extends LoginStates{}
-class LoginGetUserErrorState extends LoginStates{
+class LoginGetUserLoadingState extends LoginStates {}
+
+class LoginGetUserSuccessState extends LoginStates {}
+
+class LoginGetUserErrorState extends LoginStates {
   final String error;
   LoginGetUserErrorState(this.error);
 }

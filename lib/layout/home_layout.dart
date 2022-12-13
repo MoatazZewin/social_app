@@ -1,5 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_simple_app/modules/new_posts/new_posts.dart';
@@ -31,11 +29,11 @@ class HomeScreen extends StatelessWidget {
               HomeCubit.get(context).getPosts();
               isFromLogin = false;
             }
-          if(isFromRegister == true)
-            {
-              HomeCubit.get(context).getUserData();
-              isFromRegister = false;
-            }
+          // if(isFromRegister == true)
+          //   {
+          //     HomeCubit.get(context).getPosts();
+          //     isFromRegister = false;
+          //   }
 
 
           return Scaffold(

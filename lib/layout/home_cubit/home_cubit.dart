@@ -1,8 +1,6 @@
 import 'dart:io';
 
-import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,10 +24,10 @@ class HomeCubit extends Cubit<HomeStates> {
     emit(HomeGetUserLoadingState());
     FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
       model = UserModel.fromJson(value.data());
-      print('the data form get user state ${value.data()}');
+      // print('the data form get user state ${value.data()}');
       emit(HomeGetUserSuccessState());
     }).catchError((onError) {
-      print(onError.toString());
+      // print(onError.toString());
       emit(HomeGetUserErrorState(onError.toString()));
     });
   }
@@ -71,7 +69,7 @@ class HomeCubit extends Cubit<HomeStates> {
   Future getProfileImage() async {
     profileImage = await picker.pickImage(source: ImageSource.gallery);
     if (profileImage != null) {
-      print('the path form profile image ${imagePath}');
+      // print('the path form profile image ${imagePath}');
       imagePath = File(profileImage!.path);
       emit(ProfileImagePickedSuccessState());
     } else {
@@ -124,7 +122,7 @@ class HomeCubit extends Cubit<HomeStates> {
       p0.ref.getDownloadURL().then((value) {
         updateUser(name: name, phone: phone, bio: bio, image: value);
 
-        print('url download $p0');
+        // print('url download $p0');
       }).catchError((error) {
         emit(UploadProfileImageErrorState());
       });
@@ -146,7 +144,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .then((p0) {
       p0.ref.getDownloadURL().then((value) {
         updateUser(name: name, phone: phone, bio: bio, cover: value);
-        print('url download $p0');
+        // print('url download $p0');
       }).catchError((error) {
         emit(UploadCoverImageErrorState());
       });
@@ -154,27 +152,9 @@ class HomeCubit extends Cubit<HomeStates> {
       emit(UploadCoverImageErrorState());
     });
   }
-  //
-  // void updateUserImages({
-  //   required String name,
-  //   required String phone,
-  //   required String bio,
-  // }) {
-  //   emit(UserUpdateLoadingState());
-  //   if (imagePath != null) {
-  //     uploadProfileImage();
-  //   } else if (coverImage != null) {
-  //     uploadCoverImage();
-  //   } else if (imagePath != null && coverImage != null) {
-  //     uploadProfileImage();
-  //     uploadCoverImage();
-  //   } else {
-  //
-  //   }
-  // }
 
   void uploadPostImage({
-    required String dataTime,
+    required DateTime dataTime,
     required String text,
   }) {
     emit(CreatePostLoadingState());
@@ -184,7 +164,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .putFile(postPath!)
         .then((p0) {
       p0.ref.getDownloadURL().then((value) {
-        print('url download $p0');
+        // print('url download $p0');
         createPost(dataTime: dataTime, text: text, postImage: value);
       }).catchError((error) {
         emit(UploadPostImageErrorState());
@@ -195,10 +175,11 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   void createPost({
-    required String dataTime,
+    required DateTime dataTime,
     required String text,
     String? postImage,
   }) {
+    emit(CreatePostLoadingState());
     PostModel userModel = PostModel(
         name: model?.name,
         image: model?.image,
@@ -211,6 +192,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection('posts')
         .add(userModel.toMap())
         .then((value) {
+      getPosts();
       emit(CreatePostSuccessState());
     }).catchError((onError) {
       emit(CreatePostErrorState());
@@ -249,50 +231,98 @@ class HomeCubit extends Cubit<HomeStates> {
   List<String> postIds = [];
   List<int> likes = [];
 
-  // void getLikes()
-  // {
-  //   FirebaseFirestore.instance.collection('posts').get().then((value) {
-  //     for (var element in value.docs) {
-  //       element.reference.collection('likes').get().then((value) {
-  //         likes.add(value.docs.length);
-  //       });
-  //
-  //     }
-  //     emit(GetLikesSuccessState());
-  //   }).catchError((error){
-  //     emit(GetLikesErrorState());
-  //   });
-  // }
-
+  Map<String, bool> postUserLikes = {};
+  Map<String, Map<String, bool>> hello = {};
   void getPosts() {
-    emit(GetPostsLoadingState());
+    // totalPostsWithLikes = {};
+    // List<int> likes = [];
+    posts = [];
+    postIds = [];
+    postUserLikes = {};
+    likes = [];
+    // emit(GetPostsLoadingState());
     FirebaseFirestore.instance.collection('posts').get().then((value) {
       for (var element in value.docs) {
         element.reference.collection('likes').get().then((value) {
           likes.add(value.docs.length);
           postIds.add(element.id);
-          posts.add(PostModel.fromJson(element.data()));
-          emit(GetPostsSuccessState());
+          print('inside get posts ${value.docs}');
+
+          posts.add(PostModel.fromJson(element.data(), value.docs));
+
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(uId)
+              .collection('userlikes')
+              .get()
+              .then((value) {
+            value.docs.forEach((element) {
+              postUserLikes.addAll({element.id: true});
+            });
+            emit(GetPostsSuccessState());
+          });
         }).catchError((onError) {});
       }
+      emit(GetPostsSuccessState());
     }).catchError((error) {
       emit(GetPostsErrorState(error.toString()));
     });
   }
 
-  void likePost(String postId) {
-    FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postId)
-        .collection('likes')
-        .doc(model?.uId)
-        .set({
-      'like': true,
-    }).then((value) {
-      emit(LikePostSuccessState());
-    }).catchError((error) {
-      emit(LikePostErrorState(error.toString()));
-    });
+  void likePost(String postId, index, PostModel postModel, UserModel user) {
+    if (postUserLikes.containsKey(postId)) {
+      likes[index] = --likes[index];
+      postUserLikes.remove(postId);
+      postModel.likes?.remove(user.uId);
+      emit(ChangeLikesPostLengthSuccessState());
+      FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('likes')
+          .doc(model?.uId)
+          .delete()
+          .then((value) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(uId)
+            .collection('userlikes')
+            .doc(postId)
+            .delete()
+            .then((value) {
+          // emit(AddUserLikeSuccessState());
+        });
+        emit(DeleteLikeFromPostSuccessState());
+        // getPosts();
+      }).catchError((error) {
+        emit(DeleteLikeFromPostErrorState());
+      });
+    } else {
+      likes[index] = ++likes[index];
+      postUserLikes.addAll({postId: true});
+      postModel.likes?.add(user.uId);
+      emit(ChangeLikesPostLengthSuccessState());
+      FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('likes')
+          .doc(model?.uId)
+          .set({
+        'like': true,
+      }).then((value) {
+        emit(LikePostSuccessState());
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(uId)
+            .collection('userlikes')
+            .doc(postId)
+            .set({'like': true}).then((value) {
+          emit(AddUserLikeSuccessState());
+          // getPosts();
+        });
+      }).catchError((error) {
+        emit(LikePostErrorState(error.toString()));
+      });
+    }
   }
 
   List<UserModel> users = [];
@@ -314,7 +344,7 @@ class HomeCubit extends Cubit<HomeStates> {
 
   void sendMessage(
       {required String text,
-      required String dateTime,
+      required DateTime dateTime,
       required String? receiverId}) {
     MessageModel messageModel = MessageModel(
       text: text,
@@ -328,7 +358,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection('chats')
         .doc(receiverId)
         .collection('message')
-        .add(messageModel!.toMap())
+        .add(messageModel.toMap())
         .then((value) {
       emit(SendMessageSuccessState());
     }).catchError((error) {
@@ -341,7 +371,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection('chats')
         .doc(model?.uId)
         .collection('message')
-        .add(messageModel!.toMap())
+        .add(messageModel.toMap())
         .then((value) {
       emit(SendMessageSuccessState());
     }).catchError((error) {
@@ -363,12 +393,10 @@ class HomeCubit extends Cubit<HomeStates> {
         .listen((event) {
       messageList = [];
       event.docs.forEach((element) {
-        print(element.data().toString());
+        // print(element.data().toString());
         messageList.add(MessageModel.fromJson(element.data()));
       });
       emit(GetMessageSuccessState());
     });
-
-
   }
 }

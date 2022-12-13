@@ -21,9 +21,9 @@ class NewPosts extends StatelessWidget {
                   TextButton(onPressed: (){
                     if(HomeCubit.get(context).postImage == null)
                       {
-                        HomeCubit.get(context).createPost(dataTime: DateTime.now().toString(), text: textController.text);
+                        HomeCubit.get(context).createPost(dataTime: DateTime.now(), text: textController.text);
                       }else{
-                      HomeCubit.get(context).uploadPostImage(dataTime: DateTime.now().toString(), text: textController.text);
+                      HomeCubit.get(context).uploadPostImage(dataTime: DateTime.now(), text: textController.text);
                     }
                   }, child: const Text('POST')),
                 ]),
@@ -43,7 +43,7 @@ class NewPosts extends StatelessWidget {
                             '${HomeCubit.get(context).model?.image}'
                         ),
                       ),
-                      SizedBox(width: 15.0,),
+                      const SizedBox(width: 15.0,),
                       Text('${HomeCubit.get(context).model?.name}'),
                     ],
                   ),
@@ -56,7 +56,7 @@ class NewPosts extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20.0,),
+                  const SizedBox(height: 20.0,),
                   if(HomeCubit.get(context).postPath != null)
                   Stack(
                     alignment: AlignmentDirectional.topEnd,
@@ -85,7 +85,7 @@ class NewPosts extends StatelessWidget {
                           )),
                     ],
                   ),
-                  SizedBox(height: 20.0,),
+                  const SizedBox(height: 20.0,),
                   Row(
                     children: [
                       Expanded(

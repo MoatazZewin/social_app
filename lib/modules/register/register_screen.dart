@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_simple_app/modules/login/login_screen.dart';
 import 'package:social_simple_app/modules/register/register_cubit/register_cubit.dart';
 import 'package:social_simple_app/modules/register/register_cubit/register_states.dart';
 
-import '../../layout/home_layout.dart';
 import '../../shared/components/components.dart';
 
 class RegisterScreeen extends StatelessWidget {
@@ -21,7 +20,8 @@ class RegisterScreeen extends StatelessWidget {
       child: BlocConsumer<RegisterCubit, RegisterStates>(
         listener: (context, state) {
           if (state is CreateUserSuccessState) {
-            navigateAndFinish(context: context, widget: const HomeScreen());
+            showToast(message: 'Successful Register', color: ToastState.SUCESS);
+            navigateAndFinish(context: context, widget:  LoginScreen());
           }
         },
         builder: (context, state) {
@@ -67,7 +67,6 @@ class RegisterScreeen extends StatelessWidget {
                             }
                             return null;
                           }),
-
                       const SizedBox(
                         height: 20.0,
                       ),
@@ -123,10 +122,10 @@ class RegisterScreeen extends StatelessWidget {
                           : defaultButton(
                               text: 'Register',
                               onPressed: () {
-                                print(nameController.text);
-                                print(emailController.text);
-                                print(passwordController.text);
-                                print(phoneController.text);
+                                // print(nameController.text);
+                                // print(emailController.text);
+                                // print(passwordController.text);
+                                // print(phoneController.text);
 
                                 if (keyForm.currentState!.validate()) {
                                   cubit.userRegister(
@@ -134,7 +133,7 @@ class RegisterScreeen extends StatelessWidget {
                                       email: emailController.text,
                                       password: passwordController.text,
                                       phone: phoneController.text,
-                                  context: context);
+                                      context: context);
                                 }
                               }),
                     ],

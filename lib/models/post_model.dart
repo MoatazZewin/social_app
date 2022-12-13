@@ -2,13 +2,14 @@ class PostModel{
   String? name;
   String? uId;
   String? image;
-  String? dateTime;
+  dynamic dateTime;
   String? text;
   String? postImage;
+  List<String?>? likes=[];
 
   PostModel({this.name, this.uId, this.image,this.dateTime,this.text,this.postImage});
 
-  PostModel.fromJson(Map<String, dynamic>? json)
+  PostModel.fromJson(Map<String, dynamic>? json,  likessss)
   {
     name = json!['name'];
     uId = json['uId'];
@@ -16,6 +17,12 @@ class PostModel{
     dateTime = json['dateTime'];
     text = json['text'];
     postImage = json['postImage'];
+
+    likessss.forEach((element){
+      print('inside the constructor${element.id}');
+      likes?.add(element.id);
+    });
+
 
   }
   Map<String, dynamic> toMap()

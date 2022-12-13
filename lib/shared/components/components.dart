@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:social_simple_app/shared/styles/icon_broken.dart';
 
 import '../styles/colors.dart';
@@ -206,10 +208,12 @@ Widget buildProductItem( model, context,{bool isOldPrice = true}) {
  defaultAppBar({
   required BuildContext context,
   required String title,
+  double? elevation ,
   List<Widget>? actions,
 })
 {
   return AppBar(
+    elevation: elevation,
     leading: IconButton(
       onPressed: (){
         Navigator.pop(context);
@@ -223,4 +227,17 @@ Widget buildProductItem( model, context,{bool isOldPrice = true}) {
     actions: actions,
 
   );
+}
+
+
+String formattedDate(Timestamp timeStamp)
+{
+  var dateFormTimeStamp = DateTime.fromMillisecondsSinceEpoch(timeStamp.seconds * 1000);
+  return DateFormat('KK:mm a').format(dateFormTimeStamp);
+}
+
+String formattedDateFullDate(timeStamp)
+{
+  var dateFormTimeStamp = DateTime.fromMillisecondsSinceEpoch(timeStamp.seconds * 1000);
+  return DateFormat('dd-MM-yyyy KK:mm a').format(dateFormTimeStamp);
 }

@@ -1,8 +1,9 @@
+
 class MessageModel{
   String? text;
   String? senderId;
   String? receiverId;
-  String? dateTime;
+  dynamic dateTime;
 
 
   MessageModel({this.text, this.senderId, this.receiverId,this.dateTime});
