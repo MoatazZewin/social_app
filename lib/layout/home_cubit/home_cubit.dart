@@ -31,6 +31,10 @@ class HomeCubit extends Cubit<HomeStates> {
       emit(HomeGetUserErrorState(onError.toString()));
     });
   }
+  void emitState()
+  {
+    emit(HomeInitialState());
+  }
 
   int currentIndex = 0;
   List<Widget> screens = [
@@ -53,6 +57,10 @@ class HomeCubit extends Cubit<HomeStates> {
         if (index == 1) {
           getUsers();
         }
+        if(index == 0)
+          {
+            getPosts(number: 2);
+          }
         // if(index == 0)
         //   {
         //     getUserData();
@@ -192,7 +200,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection('posts')
         .add(userModel.toMap())
         .then((value) {
-      getPosts();
+      getPosts(number: 2);
       emit(CreatePostSuccessState());
     }).catchError((onError) {
       emit(CreatePostErrorState());
@@ -230,46 +238,125 @@ class HomeCubit extends Cubit<HomeStates> {
   List<PostModel> posts = [];
   List<String> postIds = [];
   List<int> likes = [];
+  List<int> comments = [];
 
+  List<int> likesForUsersPosts = [];
+  List<int> commentForUsersPosts = [];
+  List<String> postIdsForOwen = [];
+  List<PostModel> userPosts = [];
   Map<String, bool> postUserLikes = {};
-  Map<String, Map<String, bool>> hello = {};
-  void getPosts() {
+  // Map<String, bool> userLikesOwenPosts = {};
+  // Map<String, Map<String, bool>> hello = {};
+  void getPosts({number}) {
     // totalPostsWithLikes = {};
     // List<int> likes = [];
-    posts = [];
-    postIds = [];
-    postUserLikes = {};
-    likes = [];
+
     // emit(GetPostsLoadingState());
-    FirebaseFirestore.instance.collection('posts').get().then((value) {
-      for (var element in value.docs) {
-        element.reference.collection('likes').get().then((value) {
-          likes.add(value.docs.length);
-          postIds.add(element.id);
-          print('inside get posts ${value.docs}');
+    if(number == 1){
+      postIdsForOwen = [];
+      userPosts = [];
+      likesForUsersPosts = [];
+      commentForUsersPosts = [];
+      FirebaseFirestore.instance.collection('posts').get().then((value) {
+        for (var element in value.docs) {
+          element.reference.collection('likes').get().then((value) {
+            element.reference.collection('comments').get().then((comment){
+              // likes.add(value.docs.length);
+              // postIds.add(element.id);
+              // // print('inside get posts ${element.id}');
+              // comments.add(comment.docs.length);
+              // print('the number of comments${comment.docs.length.toString()}');
 
-          posts.add(PostModel.fromJson(element.data(), value.docs));
+              // posts.add(singlePost);
+              if(element.data()['uId'] == model?.uId)
+              {
+                PostModel singlePost = PostModel.fromJson(element.data(), value.docs, comment.docs);
+                postIdsForOwen.add(element.id);
+                userPosts.add(singlePost);
+                likesForUsersPosts.add(value.docs.length);
+                commentForUsersPosts.add(comment.docs.length);
 
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(uId)
-              .collection('userlikes')
-              .get()
-              .then((value) {
-            value.docs.forEach((element) {
-              postUserLikes.addAll({element.id: true});
+              }
+              emit(GetPostsSuccessState());
+            }).catchError((onError){});
+            // FirebaseFirestore.instance
+            //     .collection('users')
+            //     .doc(uId)
+            //     .collection('userlikes')
+            //     .get()
+            //     .then((value) {
+            //   value.docs.forEach((element) {
+            //     postUserLikes.addAll({element.id: true});
+            //
+            //   });
+            //   emit(GetPostsSuccessState());
+            // });
+
+          }).catchError((onError) {});
+        }
+        emit(GetPostsSuccessState());
+      }).catchError((error) {
+        emit(GetPostsErrorState(error.toString()));
+      });
+
+
+    }else{
+      postIdsForOwen = [];
+      posts = [];
+      postIds = [];
+      postUserLikes = {};
+      likesForUsersPosts = [];
+      commentForUsersPosts = [];
+      userPosts = [];
+      comments = [];
+      likes = [];
+      FirebaseFirestore.instance.collection('posts').get().then((value) {
+        for (var element in value.docs) {
+          element.reference.collection('likes').get().then((value) {
+            element.reference.collection('comments').get().then((comment){
+              likes.add(value.docs.length);
+              postIds.add(element.id);
+              // print('inside get posts ${element.id}');
+              comments.add(comment.docs.length);
+              // print('the number of comments${comment.docs.length.toString()}');
+              PostModel singlePost = PostModel.fromJson(element.data(), value.docs, comment.docs);
+              posts.add(singlePost);
+              if(element.data()['uId'] == model?.uId)
+              {
+                postIdsForOwen.add(element.id);
+                userPosts.add(singlePost);
+                likesForUsersPosts.add(value.docs.length);
+                commentForUsersPosts.add(comment.docs.length);
+
+              }
+
+            }).catchError((onError){});
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(uId)
+                .collection('userlikes')
+                .get()
+                .then((value) {
+              value.docs.forEach((element) {
+                postUserLikes.addAll({element.id: true});
+
+              });
+              emit(GetPostsSuccessState());
             });
-            emit(GetPostsSuccessState());
-          });
-        }).catchError((onError) {});
-      }
-      emit(GetPostsSuccessState());
-    }).catchError((error) {
-      emit(GetPostsErrorState(error.toString()));
-    });
+          }).catchError((onError) {});
+        }
+        emit(GetPostsSuccessState());
+      }).catchError((error) {
+        emit(GetPostsErrorState(error.toString()));
+      });
+    }
+
   }
 
-  void likePost(String postId, index, PostModel postModel, UserModel user) {
+
+
+  void likePost(String postId, index, PostModel postModel, UserModel user, number) {
+    if(number == 1){
     if (postUserLikes.containsKey(postId)) {
       likes[index] = --likes[index];
       postUserLikes.remove(postId);
@@ -322,6 +409,61 @@ class HomeCubit extends Cubit<HomeStates> {
       }).catchError((error) {
         emit(LikePostErrorState(error.toString()));
       });
+    }}else{
+      if(postModel.likes!.contains(user.uId)){
+        likesForUsersPosts[index] = --likesForUsersPosts[index];
+        postModel.likes?.remove(user.uId);
+        emit(ChangeLikesPostLengthSuccessState());
+        FirebaseFirestore.instance
+            .collection('posts')
+            .doc(postId)
+            .collection('likes')
+            .doc(model?.uId)
+            .delete()
+            .then((value) {
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(uId)
+              .collection('userlikes')
+              .doc(postId)
+              .delete()
+              .then((value) {
+            // emit(AddUserLikeSuccessState());
+          });
+          emit(DeleteLikeFromPostSuccessState());
+          // getPosts();
+        }).catchError((error) {
+          emit(DeleteLikeFromPostErrorState());
+        });
+
+      }else{
+        likesForUsersPosts[index] = ++likesForUsersPosts[index];
+        postModel.likes?.add(user.uId);
+        emit(ChangeLikesPostLengthSuccessState());
+        FirebaseFirestore.instance
+            .collection('posts')
+            .doc(postId)
+            .collection('likes')
+            .doc(model?.uId)
+            .set({
+          'like': true,
+        }).then((value) {
+          emit(LikePostSuccessState());
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(uId)
+              .collection('userlikes')
+              .doc(postId)
+              .set({'like': true}).then((value) {
+            emit(AddUserLikeSuccessState());
+            // getPosts();
+          });
+        }).catchError((error) {
+          emit(LikePostErrorState(error.toString()));
+        });
+
+      }
+
     }
   }
 

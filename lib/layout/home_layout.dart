@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
           if(user == null && isFromLogin == true)
             {
               HomeCubit.get(context).getUserData();
-              HomeCubit.get(context).getPosts();
+              HomeCubit.get(context).getPosts(number: 2);
               isFromLogin = false;
             }
           // if(isFromRegister == true)

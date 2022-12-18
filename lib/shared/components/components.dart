@@ -4,6 +4,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:social_simple_app/shared/styles/icon_broken.dart';
 
+import '../../layout/home_cubit/home_cubit.dart';
+import '../../models/post_model.dart';
+import '../../models/user_model.dart';
+import '../../modules/comment/comments_screen.dart';
+import '../../modules/likes/likes_screen.dart';
 import '../styles/colors.dart';
 
 
@@ -241,3 +246,266 @@ String formattedDateFullDate(timeStamp)
   var dateFormTimeStamp = DateTime.fromMillisecondsSinceEpoch(timeStamp.seconds * 1000);
   return DateFormat('dd-MM-yyyy KK:mm a').format(dateFormTimeStamp);
 }
+
+Widget buildPostItem(PostModel model, context, index , UserModel user, number) => Card(
+  elevation: 5.0,
+  margin: const EdgeInsets.all(8.0),
+  clipBehavior: Clip.antiAliasWithSaveLayer,
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 25.0,
+              backgroundImage: NetworkImage('${model.image}'),
+            ),
+            const SizedBox(
+              width: 15.0,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '${model.name}',
+                        style: const TextStyle(
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(width: 5.0),
+                      Icon(
+                        Icons.check_circle,
+                        color: defaultColor,
+                        size: 16.0,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    formattedDateFullDate(model.dateTime),
+                    style: Theme.of(context).textTheme.caption?.copyWith(
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.more_horiz,
+                  size: 16.0,
+                )),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 15.0,
+          ),
+          child: Container(
+            width: double.infinity,
+            height: 1.0,
+            color: Colors.grey[300],
+          ),
+        ),
+        Text(
+          '${model.text}',
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(
+        //     bottom: 10.0,
+        //     top: 5.0,
+        //   ),
+        //   child: SizedBox(
+        //     width: double.infinity,
+        //     child: Wrap(
+        //       children: [
+        //         Padding(
+        //           padding: const EdgeInsetsDirectional.only(
+        //             end: 6.0,
+        //           ),
+        //           child: SizedBox(
+        //             height: 25.0,
+        //             child: MaterialButton(
+        //               onPressed: () {},
+        //               minWidth: 1.0,
+        //               padding: EdgeInsets.zero,
+        //               child: Text(
+        //                 '#software',
+        //                 style:Theme.of(context).textTheme.caption?.copyWith(
+        //                   color: defaultColor,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        if (model.postImage != '')
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+              top: 15.0,
+            ),
+            child: Container(
+              height: 260,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.0),
+                image: DecorationImage(
+                  fit: BoxFit.contain,
+                  image: NetworkImage('${model.postImage}'),
+                ),
+              ),
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 5.0,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    navigateTo(context: context, widget: LikesScreen(model: model));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 5.0,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          IconBroken.Heart,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(
+                          width: 5.0,
+                        ),
+                        Text(
+                          number == 1?'${HomeCubit.get(context).likes[index]}':'${HomeCubit.get(context).likesForUsersPosts[index]}',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () {},
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 5.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(
+                          IconBroken.Chat,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(
+                          width: 5.0,
+                        ),
+                        Text(
+                          number == 1 ?'${HomeCubit.get(context).comments[index]}':'${HomeCubit.get(context).commentForUsersPosts[index]}',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            bottom: 10.0,
+          ),
+          child: Container(
+            width: double.infinity,
+            height: 1.0,
+            color: Colors.grey[300],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  navigateTo(context: context, widget: CommentsScreen(post: model, user: user, postId: HomeCubit.get(context).postIds[index],numberOfComment: HomeCubit.get(context).comments, index:index) );
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 15.0,
+                      backgroundImage: NetworkImage('${model.image}'),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    const Text('write a comment....'),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                number == 1?
+                HomeCubit.get(context).likePost(
+                    HomeCubit.get(context).postIds[index], index, model , user, number):
+                HomeCubit.get(context).likePost(
+                    HomeCubit.get(context).postIdsForOwen[index], index, model , user, number);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 5.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon(
+                      // IconBroken.Heart,
+                      Icons.favorite,
+                      color: (number == 1? HomeCubit.get(context)
+                          .postUserLikes
+                          .containsKey(
+                          HomeCubit.get(context).postIds[index]): model.likes!.contains(user.uId))
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      'Like',
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          ?.copyWith(
+                          color: (number == 1? HomeCubit.get(context)
+                              .postUserLikes
+                              .containsKey(HomeCubit.get(context)
+                              .postIds[index]) : model.likes!.contains(user.uId))
+                              ? Colors.blue
+                              : Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ),
+);

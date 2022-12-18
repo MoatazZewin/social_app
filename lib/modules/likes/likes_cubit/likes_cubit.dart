@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,6 +7,7 @@ import 'likes_states.dart';
 class LikesCubit extends Cubit<LikesState> {
   LikesCubit() : super(LikesInitial());
   static LikesCubit get(context) => BlocProvider.of(context);
+
   List<UserModel> list = [];
   void getUser(List<String?>? usersId) {
     emit(LikesGetLoadingUsers());

@@ -148,7 +148,10 @@ class ChatDetailsScreen extends StatelessWidget {
                 Text('${message!} '),
                 Text(
                   formattedDate(timeStamp),
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(fontSize: 10.0),
                 ),
               ],
             )),
