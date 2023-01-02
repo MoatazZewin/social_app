@@ -5,16 +5,21 @@ import 'package:social_simple_app/layout/home_cubit/home_states.dart';
 import 'package:social_simple_app/models/user_model.dart';
 
 import '../../shared/components/components.dart';
+import '../story/story_screen.dart';
 
 class FeedsScreen extends StatelessWidget {
-  const FeedsScreen({Key? key}) : super(key: key);
+  List<String> stories = [
+    'hello',
+    'second story',
+    'third story'
+  ];
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
         builder: (context, state) {
           UserModel? user = HomeCubit.get(context).model;
-          return HomeCubit.get(context).model != null
+          return (HomeCubit.get(context).usersForPosts.length >0 && HomeCubit.get(context).posts.length >0)
               ? SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: Column(
@@ -25,11 +30,11 @@ class FeedsScreen extends StatelessWidget {
                           itemCount: 6,
                             scrollDirection: Axis.horizontal,
                             itemBuilder: (context, index){
-                          return  buildItemStory();
+                          return  buildItemStory(context);
                         }),
                       ),
                       ListView.separated(
-                        itemBuilder: (context, index) => buildPostItem(
+                        itemBuilder: (context, index) => buildPostItem(HomeCubit.get(context).usersForPosts,
                             HomeCubit.get(context).posts[index],
                             context,
                             index, user!, 1),
@@ -51,18 +56,20 @@ class FeedsScreen extends StatelessWidget {
         listener: (context, state) {});
   }
 
-  Widget buildItemStory()
+  Widget buildItemStory(context)
   {
     return GestureDetector(
-      onTap: (){},
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          width: 50.0,
-          height: 50.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.blue,
+      onTap: (){
+        navigateTo(context: context, widget: StoryScreen(stories:stories,));
+      },
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: CircleAvatar(
+          backgroundColor: Colors.green,
+          radius: 25.5,
+          child: CircleAvatar(
+            radius: 23.0,
+            backgroundImage: NetworkImage('https://image.freepik.com/free-photo/horizontal-shot-smiling-curly-haired-woman-indicates-free-space-demonstrates-place-your-advertisement-attracts-attention-sale-wears-green-turtleneck-isolated-vibrant-pink-wall_273609-42770.jpg'),
           ),
         ),
       ),

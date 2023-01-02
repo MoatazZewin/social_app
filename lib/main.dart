@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
 
   MyApp(this.startWidget);
 
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -43,9 +44,11 @@ class MyApp extends StatelessWidget {
           startWidget is HomeScreen
               ? BlocProvider(
                   create: (context) => HomeCubit()
+                    ..getPosts(number: 2)
                     ..getUserData()
-                    ..getPosts(number: 2))
-              : BlocProvider(create: (context) => HomeCubit()),
+                    )
+
+              :BlocProvider(create: (context) => HomeCubit()),
         ],
         child: BlocConsumer<HomeCubit, HomeStates>(
             listener: (context, state) {},

@@ -38,7 +38,7 @@ class HomeCubit extends Cubit<HomeStates> {
 
   int currentIndex = 0;
   List<Widget> screens = [
-    const FeedsScreen(),
+     FeedsScreen(),
     const ChatsScreen(),
     const UsersScreen(),
     const SettingScreen(),
@@ -54,9 +54,9 @@ class HomeCubit extends Cubit<HomeStates> {
         currentIndex = --index;
         emit(HomeChangeBottomNavState());
       } else {
-        if (index == 1) {
-          getUsers();
-        }
+        // if (index == 1) {
+        //   getUsers();
+        // }
         if(index == 0)
           {
             getPosts(number: 2);
@@ -245,6 +245,8 @@ class HomeCubit extends Cubit<HomeStates> {
   List<String> postIdsForOwen = [];
   List<PostModel> userPosts = [];
   Map<String, bool> postUserLikes = {};
+  Set<String> uIdForPosts = {};
+
   // Map<String, bool> userLikesOwenPosts = {};
   // Map<String, Map<String, bool>> hello = {};
   void getPosts({number}) {
@@ -301,6 +303,7 @@ class HomeCubit extends Cubit<HomeStates> {
 
 
     }else{
+      uIdForPosts = {};
       postIdsForOwen = [];
       posts = [];
       postIds = [];
@@ -316,7 +319,8 @@ class HomeCubit extends Cubit<HomeStates> {
             element.reference.collection('comments').get().then((comment){
               likes.add(value.docs.length);
               postIds.add(element.id);
-              // print('inside get posts ${element.id}');
+              uIdForPosts.add(element.data()['uId']);
+              // print('inside get posts ${uIdForPosts.toString()}');
               comments.add(comment.docs.length);
               // print('the number of comments${comment.docs.length.toString()}');
               PostModel singlePost = PostModel.fromJson(element.data(), value.docs, comment.docs);
@@ -342,13 +346,24 @@ class HomeCubit extends Cubit<HomeStates> {
 
               });
               emit(GetPostsSuccessState());
+              if(value.docs.last.id == element.id)
+                {
+                  getUsers();
+                }
+
             });
           }).catchError((onError) {});
         }
+        // if(users.isEmpty)
+        // {
+        //   getUsers();
+        // }
         emit(GetPostsSuccessState());
+
       }).catchError((error) {
         emit(GetPostsErrorState(error.toString()));
       });
+
     }
 
   }
@@ -468,13 +483,27 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   List<UserModel> users = [];
+  Map<String, UserModel> usersForPosts={};
   void getUsers() {
     if (users.isEmpty) {
+      users = [];
+      usersForPosts={};
       emit(HomeGetAllUsersLoadingState());
       FirebaseFirestore.instance.collection('users').get().then((value) {
         for (var element in value.docs) {
           if (element.data()['uId'] != model?.uId) {
-            users.add(UserModel.fromJson(element.data()));
+            UserModel singleUser = UserModel.fromJson(element.data());
+            users.add(singleUser);
+             print('inside get userssssssssssssssssssssssssssssssss ${uIdForPosts.toString()}');
+
+            for (var value in uIdForPosts) {
+              // print('inside get userssssssssssssssssssssssssssssssss');
+              if(value == element.data()['uId'] )
+                {
+                  usersForPosts.addAll({value:singleUser});
+
+                }
+            }
           }
         }
         emit(HomeGetAllUsersSuccessState());

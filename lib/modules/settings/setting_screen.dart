@@ -158,7 +158,7 @@ class SettingScreen extends StatelessWidget {
                     ],
                   ),
                   ListView.separated(
-                    itemBuilder: (context, index) => buildPostItem(
+                    itemBuilder: (context, index) => buildPostItem(null,
                         HomeCubit.get(context).userPosts[index],
                         context,
                         index, userModel!, 2),
